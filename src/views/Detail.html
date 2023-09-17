@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>{{.PageTitle}}</h1>
+
+    {{ if not .Items }} Not found {{end}}
+    
+    {{range $item := .Items}}
+    <a href="/Detail/{{$item.Id}}">
+        <div class="">
+            <h2>{{ $item.Title }}</h2>
+    
+            <p>{{ $item.Detail }}</p>
+        </div>
+    </a>
+    {{end}}
+
+</body>
+</html>
