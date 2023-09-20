@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link rel="stylesheet" href="public/static/style.css" type="text/css">
+</head>
+    <body>
+
+        <h1 class="title">{{.PageTitle}}</h1>
+
+        {{ if not .Items }} Nothing to show {{end}}
+        
+        {{range $item := .Items}}
+        <a href="/detail/{{$item.Id}}">
+            <div class="">
+                <h2>{{ $item.Title }}</h2>
+        
+                <p>{{ $item.Detail }}</p>
+            </div>
+        </a>
+        {{end}}
+
+    </body>
+</html>

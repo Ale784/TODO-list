@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -39,44 +39,51 @@ type ProjectPath struct {
 }
 
 func main() {
+	const (
+		indexPath  string = "./public/views/*.html"
+		staticPath string = "./public/static"
+	)
 
-	temp := template.New("Index.html")
-
-	if _, err := temp.ParseFiles("./src/views/Index.html", "./src/views/Detail.html"); err != nil {
-		fmt.Println("OPPPS")
-	}
-
-	e := echo.New()
-
-	e.Renderer = NewTemplateRenderer(temp)
-	e.Use(middleware.Logger())
-	e.Use(middleware.RequestID())
+	temp := template.New("index.html")
 
 	ItemsTodo := []Todo{
 		{
-			Id:        "myfuckingid",
+			Id:        "id1",
 			Title:     "Task 1",
 			Detail:    "Buy a new phone",
 			Completed: false,
 		},
 		{
-			Id:        "myFUckingTODONUmbert2o",
+			Id:        "id2",
 			Title:     "Task 2",
 			Detail:    "Buy a new pc",
 			Completed: false,
 		},
 	}
 
+	if _, err := temp.ParseGlob(indexPath); err != nil {
+		log.Fatalf("unable to parse glob %e", err)
+	}
+
+	e := echo.New()
+
+	e.Static("public/static/", staticPath)
+
+	e.Renderer = NewTemplateRenderer(temp)
+	e.Use(middleware.Logger())
+	e.Use(middleware.RequestID())
+
 	e.GET("/", func(c echo.Context) error {
 		data := Content{
 			PageTitle: "List of todos",
 			Items:     ItemsTodo,
 		}
-		return c.Render(http.StatusOK, "Index.html", data)
+
+		return c.Render(http.StatusOK, "index.html", data)
 
 	})
 
-	e.GET("/Detail/:Id", func(c echo.Context) error {
+	e.GET("/detail/:Id", func(c echo.Context) error {
 
 		path := new(ProjectPath)
 
@@ -97,7 +104,7 @@ func main() {
 					Id:        i.Id,
 					Title:     i.Title,
 					Detail:    i.Detail,
-					Completed: false,
+					Completed: i.Completed,
 				}}
 
 			}
@@ -105,13 +112,14 @@ func main() {
 		}
 
 		SingleData := Content{
-			PageTitle: "Details Todo",
+			PageTitle: "details Todo",
 			Items:     Item,
 		}
 
-		return c.Render(http.StatusOK, "Detail.html", SingleData)
+		return c.Render(http.StatusOK, "detail.html", SingleData)
 
 	})
 
 	e.Logger.Fatal(e.Start(":1313"))
+
 }
